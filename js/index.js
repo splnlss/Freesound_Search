@@ -19,7 +19,7 @@ const freeSoundAPI = (search) =>{
   $.ajax(settings)
 }
 
-const freeSoundPreview = (id) =>{
+const freeSoundPreview = (id, index) =>{
   const settings = {
     url: `${FREESOUND_SOUND_URL}${id}`,
     type: `GET`,
@@ -29,14 +29,15 @@ const freeSoundPreview = (id) =>{
       token: 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS',
     },
     success: (data) => {
-      displayResults(data)
+      displayResults(data,index)
     },
     failure: (error) => { console.log(`error: ${error}`) }
   }
   $.ajax(settings)
 }
 
-const freeSoundSimilar = (id) =>{
+const freeSoundSimilar = (event) =>{
+  const id = event.currentTarget.data('id')
   const settings = {
     url: `${FREESOUND_SOUND_URL}${id}/similar/`,
     type: `GET`,
@@ -55,9 +56,12 @@ const freeSoundSimilar = (id) =>{
 
 const importData = (data)=>{
   if (data){
-    for(let i =0; i< data.length; i++){
-      freeSoundPreview(data[i].id)
-    }
+    data.forEach((item, index) => {
+      freeSoundPreview(data[index].id, index)
+    })
+    // for(let i =0; i< data.length; i++){
+    //   freeSoundPreview(data[i].id)
+    // }
   }else{
   $('#results').html('Zero Results')
   }
@@ -67,41 +71,61 @@ const handleFormSubmit = (event) =>{
   $('#results').html('')
   event.preventDefault()
   freeSoundAPI($('#q').val())
+  //createSVG(['#00bfff', '#00ffbf',' #00ff40', '#ffff00', '#ff0040','#8000ff'])
 }
 
 //D3 svg section
-const createSVG = (freeSounddata) =>{
-console.log(freeSounddata)
-let svg = d3.select('main')
-            .append('svg')
-              .attr('width', 800)
-              .attr('height', 600)
-              .attr('fill', '#66ff66')
+const createSVG = (data) =>{
+//console.log(fillColor)
 
-d3.svg.selectAll('circle')
-  //.data(freeSounddata)
-  //.enter()
-  .append('circle')
-    .attr('x', '200')
-    .attr('y', '200')
-    .attr('weight', )
-    // .attr('x', function(d, i){
-    //   return i * 25 })
-    // .attr('y', function(d){
-    //   return 150 - d/10 * 1.5
-    .attr('radius', '15')
-    .attr('fill', '#d1c9b8')
+const freesoundCircles = [
+  { "x_axis": 100, "y_axis": 100, "radius": 40, "color" : "green" },
+  { "x_axis": 300, "y_axis": 100, "radius": 40, "color" : "purple"},
+  { "x_axis": 500, "y_axis": 100, "radius": 40, "color" : "red"},
+  { "x_axis": 700, "y_axis": 100, "radius": 40, "color" : "blue"},
+  { "x_axis": 100, "y_axis": 300, "radius": 40, "color" : "blue"},
+  { "x_axis": 300, "y_axis": 300, "radius": 40, "color" : "red" },
+  { "x_axis": 500, "y_axis": 300, "radius": 40, "color" : "purple"},
+  { "x_axis": 700, "y_axis": 300, "radius": 40, "color" : "green"}]
+
+const svgCanvas = d3.select('main')
+              .append('svg')
+                .attr('width', 800)
+                .attr('height', 600)
+
+const circles = svgCanvas.selectAll('circle')
+                  .data(data)
+                  .append("a")
+                      .attr("xlink:href", function (d){ return d}) //*** how to create audioUrl
+                  .append('circle')
+
+const circleAttributes = circles
+              .data(freesoundCircles)
+              .enter()
+              .append('circle')
+                  .attr("cx", function (d) { return d.x_axis; })
+                  .attr("cy", function (d) { return d.y_axis; })
+                  .attr("r", function (d) { return d.radius; })
+                  .attr("id",  function (d,i) { return `button_${i}`; })
+                  .style("fill", function(d) { return d.color; })
+                  .on("mouseover", function() {
+                      console.log("mouse over")
+                      d3.select(this).style("opacity", .2)
+                    })
+                  .on('mouseleave', function(){
+                      console.log("mouse leave")
+                      d3.select(this).style("opacity", 1)
+    })
 }
 
 const setupUIHandlers = () => {
    $('#FreeSoundSearch').on('submit', handleFormSubmit)
-   $('#').on('click',freeSoundSimilar(searchResults.id))
  }
 
-const displayResults = (searchResults) =>{
-//  console.log(searchResults)
+const displayResults = (searchResults,index) =>{
+  console.log(searchResults)
   const audioUrl = searchResults.previews['preview-hq-mp3']
-  //createSVG(audioUrl.length)
+  createSVG(audioUrl)
   //mySound = new Audio('audioUrl').play()
   $('#results').append(`
       <div class="card">
@@ -109,12 +133,13 @@ const displayResults = (searchResults) =>{
       <!--  <audio src="${searchResults.previews['preview-hq-mp3']}" autoplay>
         Your browser does not support the <code>audio</code> element. -->
       </audio>
-          <div> <a href=${searchResults.previews['preview-hq-mp3']}>${searchResults.name}</a> -
-          <a href="#">more</a>
+          <div> <a href=${searchResults.previews['preview-hq-mp3']}>${index}_${searchResults.name}</a> -
+          <a class="moreButton" id="button_${index}" data-resultId=${searchResults.id}>more</a>
           </div>
         </div>
       <div>
   `)
+  $(`#button_${index}`).on('click', freeSoundSimilar)
 }
 
 $(setupUIHandlers)
