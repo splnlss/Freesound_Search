@@ -1,7 +1,9 @@
 const FREESOUND_SEARCH_URL = 'https://freesound.org/apiv2/search/text/'
 const FREESOUND_SOUND_URL = 'https://freesound.org/apiv2/sounds/'
+const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
+//const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
 //const FREESOUND_SIMILAR_URL = /apiv2/sounds/<sound_id>/similar/
-const colorSVG = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#2196F3", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722"]
+const colorSVG = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722"]
 const soundsGLOBAL = []
 let soundCountGLOBAL = 0
 
@@ -14,7 +16,7 @@ const freeSoundAPI = (search) =>{
       format: 'jsonp',
       for: 'results:*',
       query: search,
-      token: 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS',
+      token: TOKEN,
     },
     success: (data) => { importData(data.results) },
     failure: (error) => { console.log(`error: ${error}`) }
@@ -22,14 +24,14 @@ const freeSoundAPI = (search) =>{
   $.ajax(settings)
 }
 
-const freeSoundPreview = (sound) =>{
+const freeSoundPreview = (sound, clickedSoundIndex) =>{
   const settings = {
     url: `${FREESOUND_SOUND_URL}${sound.id}`,
     type: `GET`,
     dataType: `jsonp`,
     data:{
       format: 'jsonp',
-      token: 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS',
+      token: TOKEN,
     },
     success: (data) => {
       sound.previewURL = data.previews['preview-hq-mp3'] //no longer necessary
@@ -38,7 +40,7 @@ const freeSoundPreview = (sound) =>{
                 })
       soundCountGLOBAL++
       if (soundCountGLOBAL >= soundsGLOBAL.length) {
-        createSVG(soundsGLOBAL)
+        createSVG(soundsGLOBAL[(soundsGLOBAL.length-1)])
       }
     },
     failure: (error) => { console.log(`error: ${error}`) }
@@ -46,7 +48,7 @@ const freeSoundPreview = (sound) =>{
   $.ajax(settings)
 }
 
-const freeSoundSimilar = (clickedSoundID) =>{
+const freeSoundSimilar = (clickedSoundID, clickedSoundIndex) =>{
   // console.log(event.currentTarget)
   // const id = $(event.currentTarget).data('id')
   const id = clickedSoundID
@@ -56,31 +58,64 @@ const freeSoundSimilar = (clickedSoundID) =>{
     dataType: `jsonp`,
     data:{
       format: 'jsonp',
-      token: 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS',
+      token: TOKEN,
     },
     success: (data) => {
-      importData(data.results)
+      importData(data.results, clickedSoundIndex)
     },
     failure: (error) => { console.log(`error: ${error}`) }
   }
   $.ajax(settings)
 }
 
-const importData = (data)=>{
-  console.log(data)
+const importData = (data, clickedSoundIndex)=>{
   let count = 0;
+  let resultArray
+  const colorArray = []
+  const randomColor = (max) =>{
+        const randomOutput = Math.round(Math.random(max) *10)
+        //console.log(colorArray.includes(randomOuput))
+        // while((colorArray.includes(randomOuput)) {
+        //   randomOutput = Math.round(Math.random(max) *10)
+        // }else{
+          //colorArray.push(randomOuput)
+          return randomOutput
+        }
   if (data){
-    data.forEach((item, index) => {
-      const sound = {
-        name: item.name,
-        id: item.id,
-        color: colorSVG[index]
-      }
-      soundsGLOBAL.push(sound)
-      freeSoundPreview(sound)
+    if(clickedSoundIndex){  //Still necessary???
+      resultArray  = clickedSoundIndex
+      resultArray = [] //don't use array, use objects!!
+      data.forEach((item, index) => {
+        const soundSimilar = {
+          name: item.name,
+          id: item.id,
+          color: colorSVG[(randomColor(index))]
+        }
+      resultArray[index] = soundSimilar
+      freeSoundPreview(soundSimilar, clickedSoundIndex)
+      })
+      soundsGLOBAL.push(resultArray)
+      console.log(soundsGLOBAL[(soundsGLOBAL.length-1)])
+
+    }else{
+      clickedSoundIndex = 100001
+      resultArray  = clickedSoundIndex
+      console.log(resultArray)
+      resultArray = []
+      data.forEach((item, index) => {
+          const sound = {
+            name: item.name,
+            id: item.id,
+            color: colorSVG[index]
+        }
+        resultArray[index] = sound //naming of clickedSoundIndex not working...
+        freeSoundPreview(sound, clickedSoundIndex)
     })
+    }
+    soundsGLOBAL.push(resultArray)
+    console.log(soundsGLOBAL[(soundsGLOBAL.length-1)]) //use objects instead of arrays!! .clickedSoundIndex)
   }else{
-  $('#results').html('Zero Results')
+    $('#results').html('Zero Results')
   }
 }
 
@@ -90,8 +125,7 @@ const handleFormSubmit = (event) =>{
   freeSoundAPI($('#q').val())
 }
 
-//D3 svg section
-const createSVG = (data) =>{
+const createSVG = (data, index) =>{
 
 d3.select('main').html('')
 
@@ -103,6 +137,7 @@ const svgCanvas = d3.select('main')
 const circleAttributes = svgCanvas.selectAll('circle')
                   .data(data)
                   .enter()
+                //  .transition()
                   .append('circle')
                       .attr("cx", function (d, i) {
                         return (((i)%4)*200)+100})
@@ -113,15 +148,17 @@ const circleAttributes = svgCanvas.selectAll('circle')
                       .style("fill", function (d){return d.color})
                       .on("mouseover", function(d) {
                           d3.select(this).style("opacity", .2)
-                          d.previewMP3.play()
+                        //  d.previewMP3.loop('true', d.id)
+                          d.previewMP3.fade(0.0, 0.9, 100).play() //fade might not working!!
                         })
                       .on('mouseleave', function(d){
                           d3.select(this).style("opacity", 1)
-                          d.previewMP3.stop()
+                          d.previewMP3.fade(.9, 0.0, 100) //fade might not working!!
+                          d.previewMP3.pause()
                         })
                       .on('click', function(d, i) {
-                          console.log('mouse click')
-                          freeSoundSimilar(d.id)
+                          //console.log('mouse click')
+                          freeSoundSimilar(d.id, i)
                         })
 }
 
