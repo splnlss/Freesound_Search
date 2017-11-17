@@ -28,7 +28,7 @@ const freeSoundAPI = (search) =>{
   $.ajax(settings)
 }
 
-const freeSoundPreview = (sound, clickedSoundID, clickedSoundIndex) =>{
+const freeSoundPreview = (sound, clickedSound, clickedSoundIndex, callback) =>{
   const settings = {
     url: `${FREESOUND_SOUND_URL}${sound.id}`,
     type: `GET`,
@@ -41,24 +41,20 @@ const freeSoundPreview = (sound, clickedSoundID, clickedSoundIndex) =>{
       sound.previewMP3 = new Howl({
         src: [data.previews['preview-hq-mp3'], data.previews['preview-hq-ogg']]
       })
-      soundCountGLOBAL++
-      if (soundCountGLOBAL >= soundsGLOBAL.length) { // this only truly works the first time
-        if(clickedSoundID){
-          onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSoundID)
-        }else{
-          createSVG(soundsGLOBAL)
-        }
-      }
+      // if(sound.length <=5 || sound.similar.length <= 5){
+      //   noSearchResults()
+      //   console.log("no results")
+      // }
+      callback()
     },
     failure: (error) => { console.log(`error: ${error}`) }
   }
   $.ajax(settings)
 }
 
-const freeSoundSimilar = (clickedSoundID, clickedSoundIndex) =>{
-  const id = clickedSoundID
+const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
   const settings = {
-    url: `${FREESOUND_SOUND_URL}${id}/similar/`,
+    url: `${FREESOUND_SOUND_URL}${clickedSound.id}/similar/`,
     type: `GET`,
     dataType: `jsonp`,
     data:{
@@ -66,40 +62,62 @@ const freeSoundSimilar = (clickedSoundID, clickedSoundIndex) =>{
       token: TOKEN,
     },
     success: (data) => {
-      importData(data.results, clickedSoundID, clickedSoundIndex)
+      data.results.splice(0,1) //removing duplicate sound at beginning of each array)
+      importData(data.results, clickedSound, clickedSoundIndex)
     },
     failure: (error) => { console.log(`error: ${error}`) }
   }
   $.ajax(settings)
 }
 
-const importData = (data, clickedSoundID, clickedSoundIndex)=>{
-  let count = 0;
-  let resultArray = []
+const randomColor = (max, exclude) =>{
   const colorArray = []
-  const randomColor = (max) =>{
-    const randomOutput = Math.round(Math.random(max) *10)
-    //console.log(colorArray.includes(randomOuput))
-    // while((colorArray.includes(randomOuput)) {
-    //   randomOutput = Math.round(Math.random(max) *10)
-    // }else{
-    //colorArray.push(randomOuput)
-    return randomOutput
-  }
+  let randomOutput = Math.floor(Math.random() *max) //copy array and use splice!!!
+  let randomColor = colorSVG[randomOutput]
+  colorArray.push(randomColor)
+  let finished = false
+  while(!finished){
+    randomOutput = Math.floor(Math.random() *max)
+    randomColor = colorSVG[randomOutput]
+    if ((randomColor !== exclude) || !colorArray.includes(randomColor)) {
+      colorArray.push(randomColor)
+    }
+    finished = (colorArray.length === colorSVG.length)
+ }
+  console.log(colorArray)
+  return colorArray
+}
+
+const importData = (data, clickedSound, clickedSoundIndex)=>{
+  let resultArray = []
+
   if (data){
-    if(clickedSoundID){  //don't use array, use objects!!
+    if(clickedSound){
+      const colors = randomColor(data.length, clickedSound.color)
+        let count = 0;
     data.forEach((item, index) => {
+      //console.log(`item: ${item} index: ${index}`)
       const soundSimilar = {
         name: item.name,
+        parent: clickedSound,
         id: item.id,
-        color: colorSVG[(randomColor(index))],
+        color: colors[index],
         similar: []
       }
-      freeSoundPreview(soundSimilar, clickedSoundID, clickedSoundIndex)
-      soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
+      freeSoundPreview(soundSimilar, clickedSound, clickedSoundIndex, () => {
+        count++
+        soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
+        if (count >= data.length - 1) { // this only truly works the first time
+          if(clickedSound){
+            onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSound)
+          }
+        }
+      })
+      /* onclicksg when done*/
+
     })
-    //console.log(soundsGLOBAL[clickedSoundIndex].similar)
   }else{
+    let count = 0
     data.forEach((item, index) => {
       const sound = {
         name: item.name,
@@ -107,10 +125,17 @@ const importData = (data, clickedSoundID, clickedSoundIndex)=>{
         color: colorSVG[index],
         similar: []
       }
-      freeSoundPreview(sound)
-      soundsGLOBAL.push(sound)
+      freeSoundPreview(sound, null, null, () => {
+        count++
+        soundsGLOBAL.push(sound)
+        if (count >= sound.similar.length - 1) { // this only truly works the first time
+            createSVG(soundsGLOBAL)
+        }
+      })
+
     })
   }
+  console.log(soundsGLOBAL)
 }else{
   $('#results').html('Zero Results')
 }
@@ -120,6 +145,13 @@ const handleFormSubmit = (event) =>{
   event.preventDefault()
   freeSoundAPI($('#q').val())
 }
+
+// const noSearchResults = () =>{
+//     const svgCanvas = d3.select('main').html('')
+//     $('#main').append(`
+//       <a> There are not enought search results</a>
+//       `)
+// }
 
 const createSVG = (data) =>{
 
@@ -139,19 +171,19 @@ const createSVG = (data) =>{
       .attr("r", "40")
       .attr("id",  function (d,i) { return `button_${d.id}`; })
       .style("fill", function (d){return d.color})
-      .on("mouseover", function(d) {
+      .on("mouseenter", function(d) {
         d3.select(this).style("opacity", .2)
         //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
         d.previewMP3.play() //fade might not working!!
       })
-      .on('mouseleave', function(d){
+      .on('mouseout', function(d){
         d3.select(this).style("opacity", 1)
         //d.previewMP3.fade(.9, 0.0, 100) //fade might not working!!
         d.previewMP3.pause()
       })
       .on('click', function(d, i) {
         d.previewMP3.pause()
-        freeSoundSimilar(d.id, i)
+        freeSoundSimilar(d, i)
       })
     }
 

@@ -1,27 +1,47 @@
 //onClickSVG
-const onClickSVG = (data, clickedSoundID) =>{
+const onClickSVG = (data, clickedSound) =>{
 
-  const radius = 200
+  const radius = 150
   const numNodes = 8
   const circleDestinationX = WIDTH/2
   const circleDestinationY = HEIGHT/2
 
   const svgCanvas = d3.select('main').select('svg')
 
-  svgCanvas.selectAll('circle')
-  .transition()
-  .duration(500)
-  .attr("r", 30)
+    svgCanvas.selectAll('circle')
+    .transition()
+    .duration(500)
+    .attr("r", 30)
 
-  svgCanvas.select(`#button_${clickedSoundID}`)
-  .transition()
-  .duration(500)
-  .attr("cx", circleDestinationX)
-  .attr("cy", circleDestinationY)
+    svgCanvas.select(`#button_${clickedSound.id}`)
+    .transition()
+    .duration(500)
+    .attr("r", 40)
+    .attr("cx", circleDestinationX)
+    .attr("cy", circleDestinationY)
+    .on('end', function(){
 
-  .on('end', function(){
+  const clickedCircle = this
+
+    d3.selectAll('svg > *').each(
+
+      function(d,i) {
+        if (`button_${d.id}` !== clickedCircle.id) {
+        //  d3.selectAll(`circles`)
+          d3.selectAll(`#button_${d.id}`).remove()
+          d3.selectAll('line').remove()
+          //console.log(`cx: ${}`)
+          // .transition()
+          // .duration(500)
+          // .attr("cx", function (d, i) {
+          //   return (((i)%4)*200)+100})
+          //   .attr("cy", function (d, i) {
+          //     return (Math.floor(i/4)*200)+100})
+        }
+      })
     let nodes = createNodes(numNodes, radius, data);
-    createElements(svgCanvas, nodes, 25, data, clickedSoundID);
+    createElements(svgCanvas, nodes, 25, data, clickedSound);
+    console.log(`create nodes: ${nodes}`)
   })
 }
 const createNodes = function (numNodes, radius, data) {
@@ -42,12 +62,7 @@ const createNodes = function (numNodes, radius, data) {
   return nodes
 }
 
-const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSoundID) {
-  console.log(nodes)
-  // svgCanvas.selectAll('line')
-  //         .data(data)
-  //         .append('line')
-  //             .style("stroke", "blue") //function (d){return d.color})
+const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
 
   svgCanvas.selectAll('line')
   .data(nodes)
@@ -70,7 +85,7 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
               .attr("y2", function (d, i) {
                 return d.y })
 
-svgCanvas.selectAll('circles') //(`#button_${clickedSoundID}`)
+svgCanvas.selectAll('circles')
           .data(nodes)
           .enter()
           .append('circle')
@@ -88,7 +103,6 @@ svgCanvas.selectAll('circles') //(`#button_${clickedSoundID}`)
                 d3.select(this).style("opacity", .2)
                 //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
                 d.url.play() //fade might not working!!
-                console.log(d.url.play())
               })
               .on('mouseleave', function(d){
                 d3.select(this).style("opacity", 1)
@@ -97,7 +111,7 @@ svgCanvas.selectAll('circles') //(`#button_${clickedSoundID}`)
               })
               .on('click', function(d, i) {
                 d.url.pause()
-                freeSoundSimilar(d.id, i)
+                freeSoundSimilar(d, i)
               })
               .transition(2000)
                     .attr('r', elementRadius)
@@ -110,7 +124,7 @@ svgCanvas.selectAll('circles') //(`#button_${clickedSoundID}`)
 
         }
 
-// svgCanvas.selectAll('circles')//(`#button_${clickedSoundID}`)
+// svgCanvas.selectAll('circles')//(`#button_${clickedSound}`)
 //             .data(nodes)
 //             .transition()
 //             .duration(2000)

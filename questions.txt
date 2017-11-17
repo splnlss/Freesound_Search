@@ -1,0 +1,14 @@
+1. randomOutput isn't working. Causing browser to crash
+2. How to change opacity or anything really on two separate svg actions... see sort..
+    use a promise??
+3. False positives or results reload bug
+4. Sort / Order -
+    https://github.com/d3/d3-selection/blob/master/README.md#selection_order
+    There are several ways you can change the ordering of elements:
+
+      Add the circles after the rectangles, rather than before.
+      Use D3's insert operator to insert the rectangles before the circle.
+      Create one svg:g element to hold the circles, and another for the rectangles.
+      Use D3's sort operator to reorder the elements.
+5. for original circles, should I simply turn off element?
+6. Back button...
