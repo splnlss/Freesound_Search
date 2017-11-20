@@ -1,7 +1,7 @@
 const FREESOUND_SEARCH_URL = 'https://freesound.org/apiv2/search/text/'
 const FREESOUND_SOUND_URL = 'https://freesound.org/apiv2/sounds/'
-const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
-//const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
+//const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
+const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
 //const TOKEN = 'Y65kZl2GTZuwcJ9YXtStETJ42ExnHOiPvEyd5Sxd'
 //const FREESOUND_SIMILAR_URL = /apiv2/sounds/<sound_id>/similar/
 const colorSVG = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722"]
@@ -21,6 +21,8 @@ const freeSoundAPI = (search) =>{
       for: 'results:*',
       query: search,
       token: TOKEN,
+      count: 12,
+      fields: "name,id"
     },
     success: (data) => { importData(data.results) },
     failure: (error) => { console.log(`error: ${error}`) }
@@ -36,8 +38,10 @@ const freeSoundPreview = (sound, clickedSound, clickedSoundIndex, callback) =>{
     data:{
       format: 'jsonp',
       token: TOKEN,
+      fields: "previews"
     },
     success: (data) => {
+    //  console.log('URLCall_line 41:' + ${data})
       sound.previewMP3 = new Howl({
         src: [data.previews['preview-hq-mp3'], data.previews['preview-hq-ogg']]
       })
@@ -60,6 +64,8 @@ const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
     data:{
       format: 'jsonp',
       token: TOKEN,
+      count: 13,
+      fields: "name,id"
     },
     success: (data) => {
       data.results.splice(0,1) //removing duplicate sound at beginning of each array)
@@ -71,21 +77,9 @@ const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
 }
 
 const randomColor = (max, exclude) =>{
-  const colorArray = []
-  let randomOutput = Math.floor(Math.random() *max) //copy array and use splice!!!
-  let randomColor = colorSVG[randomOutput]
-  colorArray.push(randomColor)
-  let finished = false
-  while(!finished){
-    randomOutput = Math.floor(Math.random() *max)
-    randomColor = colorSVG[randomOutput]
-    if ((randomColor !== exclude) || !colorArray.includes(randomColor)) {
-      colorArray.push(randomColor)
-    }
-    finished = (colorArray.length === colorSVG.length)
- }
-  console.log(colorArray)
-  return colorArray
+    let colorArray = colorSVG.filter( color => color !== exclude)
+    // let randomColors = colorArray[Math.floor(Math.random() * colorArray.length)]
+      return colorArray
 }
 
 const importData = (data, clickedSound, clickedSoundIndex)=>{
@@ -94,30 +88,32 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
   if (data){
     if(clickedSound){
       const colors = randomColor(data.length, clickedSound.color)
-        let count = 0;
-    data.forEach((item, index) => {
+      let count = 0;
+      data.forEach((item, index) => {
       //console.log(`item: ${item} index: ${index}`)
-      const soundSimilar = {
-        name: item.name,
-        parent: clickedSound,
-        id: item.id,
-        color: colors[index],
-        similar: []
+        const soundSimilar = {
+          name: item.name,
+          parent: clickedSound,
+          id: item.id,
+          color: colors[index],
+          similar: []
       }
       freeSoundPreview(soundSimilar, clickedSound, clickedSoundIndex, () => {
         count++
+        //console.log(soundsGLOBAL[clickedSoundIndex].similar)
         soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
-        if (count >= data.length - 1) { // this only truly works the first time
-          if(clickedSound){
+        if (count >= data.length - 1){
+          // if(clickedSound){
+          //  console.log(soundsGLOBAL[clickedSoundIndex].similar)
             onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSound)
-          }
+          // }
         }
+        //count++
       })
-      /* onclicksg when done*/
-
     })
   }else{
     let count = 0
+
     data.forEach((item, index) => {
       const sound = {
         name: item.name,
@@ -128,18 +124,18 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
       freeSoundPreview(sound, null, null, () => {
         count++
         soundsGLOBAL.push(sound)
-        if (count >= sound.similar.length - 1) { // this only truly works the first time
+        if (count >= data.length - 1) {
             createSVG(soundsGLOBAL)
         }
       })
 
     })
   }
-  console.log(soundsGLOBAL)
 }else{
   $('#results').html('Zero Results')
 }
 }
+
 const handleFormSubmit = (event) =>{
   $('#results').html('')
   event.preventDefault()
@@ -174,16 +170,16 @@ const createSVG = (data) =>{
       .on("mouseenter", function(d) {
         d3.select(this).style("opacity", .2)
         //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
-        d.previewMP3.play() //fade might not working!!
+          d.previewMP3.play() //fade might not working!!
       })
       .on('mouseout', function(d){
-        d3.select(this).style("opacity", 1)
+          d3.select(this).style("opacity", 1)
         //d.previewMP3.fade(.9, 0.0, 100) //fade might not working!!
-        d.previewMP3.pause()
+          d.previewMP3.pause()
       })
       .on('click', function(d, i) {
-        d.previewMP3.pause()
-        freeSoundSimilar(d, i)
+          d.previewMP3.pause()
+          freeSoundSimilar(d, i)
       })
     }
 
