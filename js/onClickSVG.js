@@ -26,10 +26,15 @@ const onClickSVG = (data, clickedSound) =>{
     d3.selectAll('svg > *').each(
 
       function(d,i) {
-        if (`button_${d.id}` !== clickedCircle.id) {
+        if (i === 0) {
+          //console.log(`2nd: #button_${previousClickedSound}`) // second time running this becomes undefined
+          d3.select(`#button_${previousClickedSound}`).remove()
+        }
+         if (`button_${d.id}` !== clickedCircle.id) {
           //  d3.selectAll(`circles`)
           d3.selectAll(`#button_${d.id}`).remove()
           d3.selectAll('line').remove()
+
           //console.log(`cx: ${}`)
           // .transition()
           // .duration(500)
@@ -41,16 +46,16 @@ const onClickSVG = (data, clickedSound) =>{
       })
 
       let nodes = createNodes(numNodes, radius, data)
-      //createElements(svgCanvas, nodes, 25, data, clickedSound)
       // nodes.forEach(function(svgCanvas, nodes, 25, data, clickedSound)){
-      //   createElements(svgCanvas, nodes, 25, data, clickedSound)
+      createElements(svgCanvas, nodes, 25, data, clickedSound)
+      previousClickedSound = clickedSound.id
+      console.log(previousClickedSound)
       // }
-      for(i=0; i<= data.length; i++){
+      //for(i=0; i< data.length; i++){
       //  createElements(svgCanvas, nodes, 25, data, clickedSound)
-        createLines(svgCanvas, nodes, 25, data, clickedSound)
-        createCircles(svgCanvas, nodes, 25, data, clickedSound)
-      }
-      //console.log(`create nodes: ${nodes}`)
+        // createLines(svgCanvas, nodes, 25, data, clickedSound)
+        // createCircles(svgCanvas, nodes, 25, data, clickedSound)
+      //}
     })
   }
   const createNodes = function (numNodes, radius, data) {
@@ -65,8 +70,8 @@ const onClickSVG = (data, clickedSound) =>{
       // For a semicircle, we would use (i / numNodes) * Math.PI.
       x1 = (40 * Math.cos(angle)) + (WIDTH/2) // Calculate the x position of the element - radius of circle.
       y1 = (40 * Math.sin(angle)) + (HEIGHT/2)
-      x2 = ((radius-20) * Math.cos(angle)) + (WIDTH/2) // Calculate the x position of the element.
-      y2 = ((radius-20) * Math.sin(angle)) + (HEIGHT/2)
+      x2 = ((radius-30) * Math.cos(angle)) + (WIDTH/2) // Calculate the x position of the element.
+      y2 = ((radius-30) * Math.sin(angle)) + (HEIGHT/2)
       x = ((radius) * Math.cos(angle)) + (WIDTH/2) // Calculate the x position of the element.
       y = ((radius) * Math.sin(angle)) + (HEIGHT/2) // Calculate the y position of the element.
 
@@ -77,9 +82,9 @@ const onClickSVG = (data, clickedSound) =>{
 
   }
 
-  //const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
+const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
 
-const createLines = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
+// const createLines = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
     svgCanvas.selectAll('line')
     .data(nodes)
     .enter()
@@ -101,10 +106,12 @@ const createLines = function (svgCanvas, nodes, elementRadius, data, clickedSoun
                 .attr("y2", function (d, i) {
                   return d.y2 })
 
-}
-const createCircles = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
+// }
+// const createCircles = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
+//     console.log(nodes)
     svgCanvas.selectAll('circle')
-                  .data(nodes)
+                  .data([{}].concat(nodes))
+                  //append('circle')
                   .enter()
                   .append('circle')
                   .attr('r', 1)
@@ -119,6 +126,7 @@ const createCircles = function (svgCanvas, nodes, elementRadius, data, clickedSo
                           return d.color}) //function (d){return d.color})
                     .on("mouseenter", function(d) {
                       d3.select(this).style("opacity", .2)
+              //        displayLink(d.similar)
                       //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
                         d.url.play() //fade might not working!!
                     })
@@ -147,6 +155,7 @@ const createCircles = function (svgCanvas, nodes, elementRadius, data, clickedSo
     //           .attr("cy", HEIGHT/2)
 
                   }
+
 
                   // svgCanvas.selectAll('circles')//(`#button_${clickedSound}`)
                   //             .data(nodes)

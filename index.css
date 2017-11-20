@@ -20,19 +20,38 @@ header{
   position: relative;
 }
 
-fieldset{
-  border:0px;
-  padding-top: 20px;
+#FreeSoundSearch{
+
   margin-left: 100px;
-  margin-right: auto;
-  display: block;
+  width:50%;
+  display: inline-block;
   position: relative;
+}
+
+fieldset{
+    padding-top: 20px;
+    border:0px;
+    /*margin-bottom: 25px;*/
+}
+
+#searchText{
+  vertical-align: bottom;
+}
+
+#soundLink{
+  padding-top: 20px;
+  margin-right: 20px;
+  text-align: right;
+  float: right;
+  width:30%;
+  display: inline-block;
+  position: relative;
+
 }
 main{
   width: 90%;
   margin-left:auto;
   margin-right:auto;
-
   /*position:relative;*/
 }
 
@@ -40,6 +59,27 @@ main{
 
 }
 
-fieldset{
-  margin-bottom: 25px;
+a {
+  font-weight: lighter;
+  text-decoration: none;
+  color: white;
+}
+
+/* mouse over link */
+
+a:visited {
+  color: white;
+}
+
+
+a:hover {
+    font-weight: bold;
+    color: white;
+    text-decoration: underline;
+}
+}
+
+/* selected link */
+a:active {
+    color: white;
 }
