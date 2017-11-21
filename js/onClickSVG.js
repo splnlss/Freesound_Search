@@ -13,6 +13,8 @@ const onClickSVG = (data, clickedSound) =>{
   .duration(200)
   .attr("r", 30)
 
+  console.log(clickedSound)
+
   svgCanvas.select(`#button_${clickedSound.id}`)
   .transition()
   .duration(200)
@@ -20,7 +22,7 @@ const onClickSVG = (data, clickedSound) =>{
   .attr("cx", circleDestinationX)
   .attr("cy", circleDestinationY)
   .on('end', function(){
-
+    console.log($(this).data)
     const clickedCircle = this
 
     d3.selectAll('svg > *').each(
@@ -35,6 +37,20 @@ const onClickSVG = (data, clickedSound) =>{
           d3.selectAll(`#button_${d.id}`).remove()
           d3.selectAll('line').remove()
 
+          // .on("mouseenter", function(d){
+          //   $(this).animate({'opacity': '0.3'}, 10)
+          //     //  displayLink(d.similar)
+          //     clickedSound.previewMP3.play() //fade might not working!!
+          // })
+          // .on('mouseout', function(d){
+          //     $(this).animate({'opacity': '1'}, 10)
+          //     clickedSound.previewMP3.pause()
+          // })
+          // .on('click', function(d, i) {
+          //   clickedSound.previewMP3.pause()
+          //   onClickSVG(clickedSound,clickedSound.parent)
+          //   console.log(clickedSound.parent)
+          // })
           //console.log(`cx: ${}`)
           // .transition()
           // .duration(500)
@@ -49,7 +65,7 @@ const onClickSVG = (data, clickedSound) =>{
       // nodes.forEach(function(svgCanvas, nodes, 25, data, clickedSound)){
       createElements(svgCanvas, nodes, 25, data, clickedSound)
       previousClickedSound = clickedSound.id
-      console.log(previousClickedSound)
+      //console.log(previousClickedSound)
       // }
       //for(i=0; i< data.length; i++){
       //  createElements(svgCanvas, nodes, 25, data, clickedSound)
@@ -126,7 +142,7 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
                           return d.color}) //function (d){return d.color})
                     .on("mouseenter", function(d) {
                       d3.select(this).style("opacity", .2)
-              //        displayLink(d.similar)
+                      //displayLink(d)
                       //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
                         d.url.play() //fade might not working!!
                     })
