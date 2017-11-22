@@ -1,7 +1,7 @@
 const FREESOUND_SEARCH_URL = 'https://freesound.org/apiv2/search/text/'
 const FREESOUND_SOUND_URL = 'https://freesound.org/apiv2/sounds/'
-const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
-//const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
+//const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
+const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
 //const TOKEN = 'Y65kZl2GTZuwcJ9YXtStETJ42ExnHOiPvEyd5Sxd'
 //const TOKEN = `2pPoWxsaljUWbKdOUsVtv3NfVdBtBrfvjmVALAqd`
 //const FREESOUND_SIMILAR_URL = /apiv2/sounds/<sound_id>/similar/
@@ -26,6 +26,7 @@ const freeSoundAPI = (search) =>{
       count: 12,
       fields: "name,id,username" //,description
     },
+
     success: (data) => { importData(data.results) },
     failure: (error) => { console.log(`error: ${error}`) }
   }
@@ -70,7 +71,7 @@ const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
       fields: "name,id,username" //,description"
     },
     success: (data) => {
-      data.results.splice(0,1) //removing duplicate sound at beginning of each array)
+      //data.results.splice(0,1) //removing duplicate sound at beginning of each array)
       importData(data.results, clickedSound, clickedSoundIndex)
     },
     failure: (error) => { console.log(`error: ${error}`) }
@@ -96,7 +97,7 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
         const soundSimilar = {
           name: item.name,
           user: item.username,
-          description: item.description,
+        //  description: item.description,
           id: item.id,
           parent: clickedSound,
           color: colors[index],
@@ -106,7 +107,6 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
         count++
         soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
         if (count >= data.length){
-          console.log(soundsGLOBAL)
           onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSound)
         }
 
@@ -119,7 +119,7 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
       const sound = {
         name: item.name,
         user: item.username,
-        description: item.description,
+      //  description: item.description,
         id: item.id,
         color: colorSVG[index],
         similar: []
@@ -151,8 +151,18 @@ const handleFormSubmit = (event) =>{
 //       <a> There are not enought search results</a>
 //       `)
 // }
+const removeCanvas = ()=>{
+  if(d3.select("svgCanvas")){
+    d3.select("svgCanvas").remove()
+}
+}
 
 const createSVG = (data) =>{
+
+  if(d3.select("svgCanvas")){
+    d3.select("svgCanvas").remove()
+    console.log('remove')
+  }
 
   const svgCanvas = d3.select('main').html('')
   .append('svg')
@@ -183,12 +193,13 @@ const createSVG = (data) =>{
       })
       .on('click', function(d, i) {
           d.previewMP3.pause()
-          freeSoundSimilar(d, i)
+          freeSoundSimilar(d, i) //map d to actual clicked sound
       })
     }
 
 const displayLink = (data) =>{
       // convert to a string with x characters and remove last character in string - alt="${truncatedDescription}"
+          console.log(data)
           const nameTruncate=(data.name)
           const textName = textTruncate(data.name)
           $('#soundLink').html(``)
@@ -199,13 +210,12 @@ const displayLink = (data) =>{
           }
 
 const textTruncate = (str) =>{
-          length = 40;
+          length = 50;
           ending = '...';
 
           if (str.length > length) {
             return str.substring(0, length - ending.length) + ending;
           } else {
-            console.log(str)
             return str;
           }
         }
