@@ -67,11 +67,11 @@ const onClickSVG = (data, clickedSound) =>{
           //     return (Math.floor(i/4)*200)+100})
       //  }
       })
-
+      previousClickedSound = clickedSound.id
       let nodes = createNodes(numNodes, radius, data, clickedSound)
       // nodes.forEach(function(svgCanvas, nodes, 25, data, clickedSound)){
       createElements(svgCanvas, nodes, 25, data, clickedSound)
-      previousClickedSound = clickedSound.id
+
       //console.log(previousClickedSound)
       // }
       //for(i=0; i< data.length; i++){
@@ -82,6 +82,10 @@ const onClickSVG = (data, clickedSound) =>{
     })
   }
   const createNodes = function (numNodes, radius, data, clickedSound) {
+    console.log('clicked sound below')
+    console.log(clickedSound)
+    console.log('Parent of clicekd sound below')
+    console.log(clickedSound.parent)
     let nodes = [],
     angle,
     x,
@@ -98,7 +102,9 @@ const onClickSVG = (data, clickedSound) =>{
       x = ((radius) * Math.cos(angle)) + (WIDTH/2) // Calculate the x position of the element.
       y = ((radius) * Math.sin(angle)) + (HEIGHT/2) // Calculate the y position of the element.
 
-      nodes.push({'w': x1, 'h': y1, 'x': x, 'y': y,'x2': x2, 'y2': y2, 'id':data[i].id, 'name':data[i].name, 'user':data[i].user, 'color':data[i].color, 'url':data[i].previewMP3, 'parent':clickedSound.parent }, )
+      nodes.push({'w': x1, 'h': y1, 'x': x, 'y': y,'x2': x2, 'y2': y2, 'id':data[i].id, 'name':data[i].name, 'user':data[i].user, 'color':data[i].color,
+      'url':data[i].previewMP3,
+      'parent':clickedSound.parent }, )
     //  console.log(`x1 = ${x1}, y1 = ${y1}: x1 = ${WIDTH/2}, y1 = ${HEIGHT/2}`)
     }
     return nodes
@@ -162,7 +168,8 @@ console.log(nodes.parent)
                     .on('click', function(d, i) {
                       d.url.pause()
                       if(i===0){
-                      onClickSVG(d.parent.similar,d.parent )
+                      //console.log(d.parent)
+                      //onClickSVG(d.parent.similar,d.parent )
                       }else{
                       freeSoundSimilar(d, i)
                     }

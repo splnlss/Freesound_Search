@@ -24,36 +24,10 @@ const freeSoundAPI = (search) =>{
       query: search,
       token: TOKEN,
       count: 12,
-      fields: "name,id,username" //,description
+      fields: "name,id,username,url,previews" //,description
     },
 
     success: (data) => { importData(data.results) },
-    failure: (error) => { console.log(`error: ${error}`) }
-  }
-  $.ajax(settings)
-}
-
-const freeSoundPreview = (sound, clickedSound, clickedSoundIndex, callback) =>{
-  const settings = {
-    url: `${FREESOUND_SOUND_URL}${sound.id}`,
-    type: `GET`,
-    dataType: `jsonp`,
-    data:{
-      format: 'jsonp',
-      token: TOKEN,
-      fields: "previews"
-    },
-    success: (data) => {
-    //  console.log('URLCall_line 41:' + ${data})
-      sound.previewMP3 = new Howl({
-        src: [data.previews['preview-hq-mp3'], data.previews['preview-hq-ogg']]
-      })
-      // if(sound.length <=5 || sound.similar.length <= 5){
-      //   noSearchResults()
-      //   console.log("no results")
-      // }
-      callback()
-    },
     failure: (error) => { console.log(`error: ${error}`) }
   }
   $.ajax(settings)
@@ -68,10 +42,11 @@ const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
       format: 'jsonp',
       token: TOKEN,
       count: 13,
-      fields: "name,id,username" //,description"
+      fields: "name,id,username,url,previews" //,description"
     },
     success: (data) => {
-      //data.results.splice(0,1) //removing duplicate sound at beginning of each array)
+      console.log('clicked sound in freesoundsimilar')
+      console.log(clickedSound)
       importData(data.results, clickedSound, clickedSoundIndex)
     },
     failure: (error) => { console.log(`error: ${error}`) }
@@ -81,19 +56,18 @@ const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
 
 const randomColor = (max, exclude) =>{
     let colorArray = colorSVG.filter( color => color !== exclude)
-    // let randomColors = colorArray[Math.floor(Math.random() * colorArray.length)]
       return colorArray
 }
 
 const importData = (data, clickedSound, clickedSoundIndex)=>{
+  console.log('clickedsound in importdata')
+  console.log(clickedSound)
   let resultArray = []
-
+  console.log(data)
   if (data){
     if(clickedSound){
       const colors = randomColor(data.length, clickedSound.color)
-      let count = 0;
       data.forEach((item, index) => {
-      //console.log(`item: ${item} index: ${index}`)
         const soundSimilar = {
           name: item.name,
           user: item.username,
@@ -101,20 +75,15 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
           id: item.id,
           parent: clickedSound,
           color: colors[index],
-          similar: []
+          similar: [],
+          previewMP3: new Howl({
+            src: [item.previews['preview-hq-mp3'], item.previews['preview-hq-ogg']]
+          })
       }
-      freeSoundPreview(soundSimilar, clickedSound, clickedSoundIndex, () => {
-        count++
-        soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
-        if (count >= data.length){
-          onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSound)
-        }
-
-      })
+      soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
     })
+    onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSound)
   }else{
-    let count = 0
-
     data.forEach((item, index) => {
       const sound = {
         name: item.name,
@@ -122,17 +91,14 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
       //  description: item.description,
         id: item.id,
         color: colorSVG[index],
-        similar: []
+        similar: [],
+        previewMP3: new Howl({
+          src: [item.previews['preview-hq-mp3'], item.previews['preview-hq-ogg']]
+        })
       }
-      freeSoundPreview(sound, null, null, () => {
-        count++
-        soundsGLOBAL.push(sound)
-        if (count >= data.length) {
-
-            createSVG(soundsGLOBAL)
-        }
-      })
+      soundsGLOBAL.push(sound)
     })
+    createSVG(soundsGLOBAL)
   }
 }else{
   $('#results').html('Zero Results')
@@ -140,8 +106,9 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
 }
 
 const handleFormSubmit = (event) =>{
-  $('#results').html('')
   event.preventDefault()
+  soundsGLOBAL.splice(0,soundsGLOBAL.length) //remove all of array, clear array
+  $('#results').html('')
   freeSoundAPI($('#q').val())
 }
 
@@ -151,18 +118,8 @@ const handleFormSubmit = (event) =>{
 //       <a> There are not enought search results</a>
 //       `)
 // }
-const removeCanvas = ()=>{
-  if(d3.select("svgCanvas")){
-    d3.select("svgCanvas").remove()
-}
-}
 
 const createSVG = (data) =>{
-
-  if(d3.select("svgCanvas")){
-    d3.select("svgCanvas").remove()
-    console.log('remove')
-  }
 
   const svgCanvas = d3.select('main').html('')
   .append('svg')
@@ -193,7 +150,7 @@ const createSVG = (data) =>{
       })
       .on('click', function(d, i) {
           d.previewMP3.pause()
-          freeSoundSimilar(d, i) //map d to actual clicked sound
+          freeSoundSimilar(soundsGLOBAL[i], i) //map d to actual clicked sound
       })
     }
 
