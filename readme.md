@@ -1,4 +1,4 @@
-#Sound Stumble - a sound search tool that querries Freesound.org's api using a spoke and wheel visual GUI.
+#Sound Stumble - a sound search tool that queries Freesound.org's api using a spoke and wheel visual GUI.
 
 ##Introduction Sound Stumble - The goal is to create a fun, creative and fast way to stumble onto new sounds one would not have originally chosen.
 #See Screenshots

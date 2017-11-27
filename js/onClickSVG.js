@@ -121,25 +121,4 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
                           .attr('cy', function (d, i) {
                             return d.y;
                           })
-    // svgCanvas.select(`#button_${clickedSound.id}`)
-    //           .transition()
-    //           .duration(200)
-    //           .attr("r", 41)
-    //           .attr("cx", WIDTH/2)
-    //           .attr("cy", HEIGHT/2)
-
-                  }
-
-
-                  // svgCanvas.selectAll('circles')//(`#button_${clickedSound}`)
-                  //             .data(nodes)
-                  //             .transition()
-                  //             .duration(2000)
-                  //                 .attr('r', elementRadius)
-                  //                 .attr('cx', function (d, i) {
-                  //                   return d.x;
-                  //                 })
-                  //                 .attr('cy', function (d, i) {
-                  //                   return d.y;
-                  //                 })
-                  // }
+                        }
