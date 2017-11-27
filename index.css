@@ -55,6 +55,16 @@ main{
   /*position:relative;*/
 }
 
+#instructions{
+  color:lightgrey;
+  padding-top: 250px;
+  margin-right: auto;
+  margin-left: auto;
+  width:80%;
+  text-align: center;
+  display: block;
+  position: relative;
+}
 #results *{
 
 }

@@ -28,7 +28,9 @@ const freeSoundAPI = (search) =>{
     },
 
     success: (data) => { importData(data.results) },
-    failure: (error) => { console.log(`error: ${error}`) }
+    failure: (error) => { console.log(`error: ${error}`)
+      noSearchResults()
+   }
   }
   $.ajax(settings)
 }
@@ -45,11 +47,11 @@ const freeSoundSimilar = (clickedSound, clickedSoundIndex) =>{
       fields: "name,id,username,url,previews" //,description"
     },
     success: (data) => {
-      console.log('clicked sound in freesoundsimilar')
-      console.log(clickedSound)
       importData(data.results, clickedSound, clickedSoundIndex)
     },
-    failure: (error) => { console.log(`error: ${error}`) }
+    failure: (error) => { console.log(`error: ${error}`)
+        noSearchResults()
+  }
   }
   $.ajax(settings)
 }
@@ -60,10 +62,10 @@ const randomColor = (max, exclude) =>{
 }
 
 const importData = (data, clickedSound, clickedSoundIndex)=>{
-  console.log('clickedsound in importdata')
-  console.log(clickedSound)
+  if (data.length <= 3){
+    noSearchResults()
+  }else{
   let resultArray = []
-  console.log(data)
   if (data){
     if(clickedSound){
       const colors = randomColor(data.length, clickedSound.color)
@@ -101,7 +103,8 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
     createSVG(soundsGLOBAL)
   }
 }else{
-  $('#results').html('Zero Results')
+  noSearchResults()
+}
 }
 }
 
@@ -112,12 +115,14 @@ const handleFormSubmit = (event) =>{
   freeSoundAPI($('#q').val())
 }
 
-// const noSearchResults = () =>{
-//     const svgCanvas = d3.select('main').html('')
-//     $('#main').append(`
-//       <a> There are not enought search results</a>
-//       `)
-// }
+const noSearchResults = () =>{
+    $('main').html('')
+    $('main').append(`
+      <section role="region" id="instructions" aria-live="assertive">
+        <span> There are not enough search results </span>
+      </section>
+      `)
+}
 
 const createSVG = (data) =>{
 
@@ -155,8 +160,7 @@ const createSVG = (data) =>{
     }
 
 const displayLink = (data) =>{
-      // convert to a string with x characters and remove last character in string - alt="${truncatedDescription}"
-          console.log(data)
+
           const nameTruncate=(data.name)
           const textName = textTruncate(data.name)
           $('#soundLink').html(``)

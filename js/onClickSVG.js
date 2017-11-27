@@ -13,8 +13,6 @@ const onClickSVG = (data, clickedSound) =>{
   .duration(200)
   .attr("r", 30)
 
-  //console.log(clickedSound)
-
   svgCanvas.select(`#button_${clickedSound.id}`)
   .transition()
   .duration(200)
@@ -27,65 +25,15 @@ const onClickSVG = (data, clickedSound) =>{
     d3.selectAll('svg > *').each(
 
       function(d,i) {
-        /*if (i === 0) {
-          //console.log(`2nd: #button_${previousClickedSound}`) // second time running this becomes undefined
-          d3.select(`#button_${previousClickedSound}`).remove()
-        }*/
-         //if (`button_${d.id}` !== clickedCircle.id){
-          //  d3.selectAll(`circles`)
          d3.selectAll(`#button_${d.id}`).remove()
          d3.selectAll('line').remove()
-          // d3.selectAll(`#button_${d.id}`)
-          //     .enter()
-          //     .transition()
-          //     .duration(200)
-          //     .attr("cx", function (d, i) {
-          //       return (((i)%4)*200)+100})
-          //       .attr("cy", function (d, i) {
-          //         return (Math.floor(i/4)*200)+100})
-
-          // .on("mouseenter", function(d){
-          //   $(this).animate({'opacity': '0.3'}, 10)
-          //     //  displayLink(d.similar)
-          //     clickedSound.previewMP3.play() //fade might not working!!
-          // })
-          // .on('mouseout', function(d){
-          //     $(this).animate({'opacity': '1'}, 10)
-          //     clickedSound.previewMP3.pause()
-          // })
-          // .on('click', function(d, i) {
-          //   clickedSound.previewMP3.pause()
-          //   onClickSVG(clickedSound,clickedSound.parent)
-          //   console.log(clickedSound.parent)
-          // })
-          //console.log(`cx: ${}`)
-          // .transition()
-          // .duration(500)
-          // .attr("cx", function (d, i) {
-          //   return (((i)%4)*200)+100})
-          //   .attr("cy", function (d, i) {
-          //     return (Math.floor(i/4)*200)+100})
-      //  }
       })
       previousClickedSound = clickedSound.id
       let nodes = createNodes(numNodes, radius, data, clickedSound)
-      // nodes.forEach(function(svgCanvas, nodes, 25, data, clickedSound)){
       createElements(svgCanvas, nodes, 25, data, clickedSound)
-
-      //console.log(previousClickedSound)
-      // }
-      //for(i=0; i< data.length; i++){
-      //  createElements(svgCanvas, nodes, 25, data, clickedSound)
-        // createLines(svgCanvas, nodes, 25, data, clickedSound)
-        // createCircles(svgCanvas, nodes, 25, data, clickedSound)
-      //}
     })
   }
   const createNodes = function (numNodes, radius, data, clickedSound) {
-    console.log('clicked sound below')
-    console.log(clickedSound)
-    console.log('Parent of clicekd sound below')
-    console.log(clickedSound.parent)
     let nodes = [],
     angle,
     x,
@@ -105,7 +53,6 @@ const onClickSVG = (data, clickedSound) =>{
       nodes.push({'w': x1, 'h': y1, 'x': x, 'y': y,'x2': x2, 'y2': y2, 'id':data[i].id, 'name':data[i].name, 'user':data[i].user, 'color':data[i].color,
       'url':data[i].previewMP3,
       'parent':clickedSound.parent }, )
-    //  console.log(`x1 = ${x1}, y1 = ${y1}: x1 = ${WIDTH/2}, y1 = ${HEIGHT/2}`)
     }
     return nodes
 
@@ -113,7 +60,6 @@ const onClickSVG = (data, clickedSound) =>{
 
 const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
 
-// const createLines = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
     svgCanvas.selectAll('line')
     .data(nodes.slice(1))
     .enter()
@@ -135,13 +81,8 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
                 .attr("y2", function (d, i) {
                   return d.y2 })
 
-// }
-// const createCircles = function (svgCanvas, nodes, elementRadius, data, clickedSound) {
-//     console.log(nodes)
-console.log(nodes.parent)
     svgCanvas.selectAll('circle')
                   .data(nodes)
-                  //append('circle')
                   .enter()
                   .append('circle')
                   .attr('r', function (d, i) { return (i === 0) ? 40 : 1})
@@ -168,8 +109,6 @@ console.log(nodes.parent)
                     .on('click', function(d, i) {
                       d.url.pause()
                       if(i===0){
-                      //console.log(d.parent)
-                      //onClickSVG(d.parent.similar,d.parent )
                       }else{
                       freeSoundSimilar(d, i)
                     }
