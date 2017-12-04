@@ -7,31 +7,48 @@ body{
   text-shadow: 0px 0 lightgrey;
   font-weight: lighter;
   color: white;
-  /*rgb(244, 67, 54)*/
   padding:0;
-  margin:0;
+  margin: 0;
 }
+
 header{
   background-color: rgb(0, 188, 212);
   height: 60px;
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  position: relative;
-}
-
-#FreeSoundSearch{
-
-  margin-left: 80px;
-  width:50%;
-  display: inline-block;
-  position: relative;
+  width: 100%;
+  margin:0;
 }
 
 fieldset{
-    padding-top: 20px;
-    border:0px;
-    /*margin-bottom: 25px;*/
+  border:0px;
+}
+main{
+
+}
+
+a {
+  font-weight: lighter;
+  text-decoration: none;
+  color: white;
+}
+
+a:visited {
+  color: white;
+}
+
+a:hover {
+    /*font-weight: bold;*/
+    color: white;
+    text-decoration: underline;
+}
+a:active {
+    color: white;
+}
+
+#FreeSoundSearch{
+  top: 20px;
+  left: 20%;
+  position: absolute;
+  margin: 0, auto;
 }
 
 #searchText{
@@ -46,50 +63,59 @@ fieldset{
   width:30%;
   display: inline-block;
   position: relative;
-
-}
-main{
-  width: 90%;
-  margin-left:auto;
-  margin-right:auto;
-  /*position:relative;*/
 }
 
 #instructions{
   color:lightgrey;
-  padding-top: 250px;
-  margin-right: auto;
-  margin-left: auto;
-  width:80%;
+  left:50%;
   text-align: center;
-  display: block;
-  position: relative;
-}
-#results *{
-
-}
-
-a {
-  font-weight: lighter;
-  text-decoration: none;
-  color: white;
-}
-
-/* mouse over link */
-
-a:visited {
-  color: white;
+  position: absolute;
+  top: 50%;
+  width:80%;
+  transform: translate(-50%,-50%);
 }
 
 
-a:hover {
-    font-weight: bold;
-    color: white;
-    text-decoration: underline;
-}
-}
+@media only screen and (max-width: 640px) {
+  /* move / fix searchbox */
+  fieldset{
+      /*padding-top: 5%;*/
+      border:0px;
+  }
+  a {
+    font-weight: lighter;
+    text-decoration: none;
+    color: darkgrey;
+  }
 
-/* selected link */
-a:active {
-    color: white;
+  a:visited {
+    color: darkgrey;
+  }
+
+  a:hover {
+      color: black;
+  }
+  a:active {
+      color: darkgrey;
+  }
+
+
+  #FreeSoundSearch{
+    top: 8px;
+    left: 5%;
+  }
+
+  #searchText{
+    vertical-align: bottom;
+  }
+
+  #soundLink{
+    color: darkgrey;
+    text-align: left;
+    left:10%;
+    width: 80%;
+    position:absolute;
+    top: 40px;
+
+  }
 }

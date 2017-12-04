@@ -1,10 +1,10 @@
 const FREESOUND_SEARCH_URL = 'https://freesound.org/apiv2/search/text/'
 const FREESOUND_SOUND_URL = 'https://freesound.org/apiv2/sounds/'
 //const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
-const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
-//const TOKEN = 'Y65kZl2GTZuwcJ9YXtStETJ42ExnHOiPvEyd5Sxd'
+//const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
+const TOKEN = 'Y65kZl2GTZuwcJ9YXtStETJ42ExnHOiPvEyd5Sxd'
 //const TOKEN = `2pPoWxsaljUWbKdOUsVtv3NfVdBtBrfvjmVALAqd`
-//const FREESOUND_SIMILAR_URL = /apiv2/sounds/<sound_id>/similar/
+
 const colorSVG = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722"]
 const soundsGLOBAL = []
 let previousClickedSound = 0
@@ -126,9 +126,16 @@ const noSearchResults = () =>{
 
 const createSVG = (data) =>{
 
+const innerWidth = window.innerWidth
+const mobile = innerWidth < 640
+  const width = mobile ? innerWidth*.9 : WIDTH
+  const columns = mobile ? 3 : 4
+  const multiplier = mobile ? width/3 : width/5
+  const offset = width/5
+  const radius = mobile ? 25 : 40
   const svgCanvas = d3.select('main').html('')
   .append('svg')
-  .attr('width', WIDTH)
+  .attr('width', width)
   .attr('height', HEIGHT)
 
   const circleAttributes = svgCanvas.selectAll('circle')
@@ -136,10 +143,10 @@ const createSVG = (data) =>{
   .enter()
   .append('circle')
   .attr("cx", function (d, i) {
-    return (((i)%4)*200)+100})
+    return (((i)%columns)*multiplier)+offset})
     .attr("cy", function (d, i) {
-      return (Math.floor(i/4)*200)+100})
-      .attr("r", "40")
+      return (Math.floor(i/columns)*multiplier)+offset})
+      .attr("r", radius)
       .attr("id",  function (d,i) { return `button_${d.id}`; })
       .style("fill", function (d){return d.color})
       .on("mouseenter", function(d) {
