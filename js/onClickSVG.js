@@ -1,15 +1,16 @@
 //onClickSVG
 const onClickSVG = (data, clickedSound) =>{
 
-  const innerWidth = window.innerWidth
-  const mobile = innerWidth < 640
-  const width = mobile ? innerWidth*.9 : WIDTH
+
+  const mobile = window.innerWidth < 640
+  const width = mobile ? window.innerWidth*.9 : WIDTH
+  const height = mobile ? window.innerHeight*.9 : HEIGHT
   // const height = width*.75
   const radius = width/4
   const numNodes = 8
-  const circleDestinationX = width/2
-  const circleDestinationY = HEIGHT/2
-
+  const circleDestinationX = width/4
+  const circleDestinationY = height/2
+  console.log(width, window.innerWidth,height,window.innerHeight)
 
   const svgCanvas = d3.select('main').select('svg')
 
@@ -34,26 +35,26 @@ const onClickSVG = (data, clickedSound) =>{
          d3.selectAll('line').remove()
       })
       previousClickedSound = clickedSound.id
-      let nodes = createNodes(numNodes, radius, data, clickedSound,width)
-      createElements(svgCanvas, nodes, 25, data, clickedSound, width)
+      let nodes = createNodes(numNodes, radius, data, clickedSound,width, height)
+      createElements(svgCanvas, nodes, 25, data, clickedSound, width, height)
     })
   }
-  const createNodes = function (numNodes, radius, data, clickedSound, width) {
+  const createNodes = function (numNodes, radius, data, clickedSound, width, height) {
     let nodes = [],
     angle,
     x,
     y,
     i
-    nodes.push({'x': (width/2), 'y': (HEIGHT/2), 'id':data[0].id, 'name': data[0].name, 'user': data[0].user, 'color':data[0].color, 'url': data[0].previewMP3, 'parent':clickedSound.parent }, )
+    nodes.push({'x': (width/2), 'y': (height/2), 'id':data[0].id, 'name': data[0].name, 'user': data[0].user, 'color':data[0].color, 'url': data[0].previewMP3, 'parent':clickedSound.parent }, )
     for (i=1; i<=numNodes; i++) {
       angle = ((i - 1) / (numNodes/2)) * Math.PI // Calculate the angle at which the element will be placed.
       // For a semicircle, we would use (i / numNodes) * Math.PI.
       x1 = (40 * Math.cos(angle)) + (width/2) // Calculate the x position of the element - radius of circle.
-      y1 = (40 * Math.sin(angle)) + (HEIGHT/2)
+      y1 = (40 * Math.sin(angle)) + (height/2)
       x2 = ((radius-30) * Math.cos(angle)) + (width/2) // Calculate the x position of the element.
-      y2 = ((radius-30) * Math.sin(angle)) + (HEIGHT/2)
+      y2 = ((radius-30) * Math.sin(angle)) + (height/2)
       x = ((radius) * Math.cos(angle)) + (width/2) // Calculate the x position of the element.
-      y = ((radius) * Math.sin(angle)) + (HEIGHT/2) // Calculate the y position of the element.
+      y = ((radius) * Math.sin(angle)) + (height/2) // Calculate the y position of the element.
 
       nodes.push({'w': x1, 'h': y1, 'x': x, 'y': y,'x2': x2, 'y2': y2, 'id':data[i].id, 'name':data[i].name, 'user':data[i].user, 'color':data[i].color,
       'url':data[i].previewMP3,
@@ -63,7 +64,7 @@ const onClickSVG = (data, clickedSound) =>{
 
   }
 
-const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound, width) {
+const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound, width, height) {
 
     svgCanvas.selectAll('line')
     .data(nodes.slice(1))
@@ -95,7 +96,7 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
                     return width/2;
                   })
                   .attr('cy', function (d, i) {
-                    return HEIGHT/2;
+                    return height/2;
                   })
                   .attr("id",  function (d,i) { return `button_${d.id}`; })
                   .style("fill", function (d, i) {
