@@ -10,19 +10,18 @@ const onClickSVG = (data, clickedSound) =>{
   const numNodes = 8
   const circleDestinationX = width/4
   const circleDestinationY = height/2
-  console.log(width, window.innerWidth,height,window.innerHeight)
 
   const svgCanvas = d3.select('main').select('svg')
 
   svgCanvas.selectAll('circle')
   .transition()
   .duration(200)
-  .attr("r", 30)
+  .attr("r", (radius/4 -10))
 
   svgCanvas.select(`#button_${clickedSound.id}`)
   .transition()
   .duration(200)
-  .attr("r", 40)
+  .attr("r", (radius/4 + 10))
   .attr("cx", circleDestinationX)
   .attr("cy", circleDestinationY)
   .on('end', function(){

@@ -65,6 +65,12 @@ a:active {
   position: relative;
 }
 
+#results{
+  top: 20px;
+  left: 20%;
+  position: absolute;
+  margin: 0, auto;
+}
 #instructions{
   color:lightgrey;
   left:50%;
