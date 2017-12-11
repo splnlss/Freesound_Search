@@ -71,6 +71,7 @@ a:active {
   position: absolute;
   margin: 0, auto;
 }
+
 #instructions{
   color:lightgrey;
   left:50%;
@@ -81,6 +82,12 @@ a:active {
   transform: translate(-50%,-50%);
 }
 
+header.landingPage{
+    background-color: rgb(0, 188, 212);
+    height: 100%;
+    width: 100%;
+    margin:0;
+}
 
 @media only screen and (max-width: 640px) {
   /* move / fix searchbox */

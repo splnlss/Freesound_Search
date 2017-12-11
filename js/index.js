@@ -24,9 +24,8 @@ const freeSoundAPI = (search) =>{
       query: search,
       token: TOKEN,
       count: 12,
-      fields: "name,id,username,url,previews" //,description
+      fields: "name,id,username,url,previews" // description
     },
-
     success: (data) => { importData(data.results) },
     failure: (error) => { console.log(`error: ${error}`)
       noSearchResults()
@@ -128,10 +127,10 @@ const createSVG = (data) =>{
 
 const innerWidth = window.innerWidth
 const mobile = innerWidth < 640
-  const width = mobile ? innerWidth*.9 : WIDTH
+  const width = mobile ? innerWidth : WIDTH
   const columns = mobile ? 3 : 4
   const multiplier = mobile ? width/3 : width/5
-  const offset = width/5
+  const offset = width/6
   const radius = mobile ? 25 : 40
   const svgCanvas = d3.select('main').html('')
   .append('svg')
@@ -152,13 +151,26 @@ const mobile = innerWidth < 640
       .on("mouseenter", function(d) {
         d3.select(this).style("opacity", .2)
         displayLink(d)
-        //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
           d.previewMP3.play() //fade might not working!!
+      })
+      .on("touchstart", function(d) {
+        d3.select(this).style("opacity", .2)
+        displayLink(d)
+        d.previewMP3.play()
       })
       .on('mouseout', function(d){
           d3.select(this).style("opacity", 1)
-        //d.previewMP3.fade(.9, 0.0, 100) //fade might not working!!
           d.previewMP3.pause()
+      })
+      .on('touchcancel', function(d){
+          d3.select(this).style("opacity", 1)
+          d.previewMP3.pause()
+          console.log('Touch Cancel')
+      })
+      .on('touchend', function(d){
+          d3.select(this).style("opacity", 1)
+          d.previewMP3.pause()
+          console.log('Touch End')
       })
       .on('click', function(d, i) {
           d.previewMP3.pause()

@@ -3,12 +3,13 @@ const onClickSVG = (data, clickedSound) =>{
 
 
   const mobile = window.innerWidth < 640
-  const width = mobile ? window.innerWidth*.9 : WIDTH
-  const height = mobile ? window.innerHeight*.9 : HEIGHT
+  const width = mobile ? window.innerWidth : WIDTH
+  const height = mobile ? window.innerHeight : HEIGHT
   // const height = width*.75
-  const radius = width/4
+  //const offset = width/6
+  const radius = mobile ? width*.35 : width/4
   const numNodes = 8
-  const circleDestinationX = width/4
+  const circleDestinationX = width/2
   const circleDestinationY = height/2
 
   const svgCanvas = d3.select('main').select('svg')
@@ -38,6 +39,7 @@ const onClickSVG = (data, clickedSound) =>{
       createElements(svgCanvas, nodes, 25, data, clickedSound, width, height)
     })
   }
+
   const createNodes = function (numNodes, radius, data, clickedSound, width, height) {
     let nodes = [],
     angle,
@@ -47,20 +49,18 @@ const onClickSVG = (data, clickedSound) =>{
     nodes.push({'x': (width/2), 'y': (height/2), 'id':data[0].id, 'name': data[0].name, 'user': data[0].user, 'color':data[0].color, 'url': data[0].previewMP3, 'parent':clickedSound.parent }, )
     for (i=1; i<=numNodes; i++) {
       angle = ((i - 1) / (numNodes/2)) * Math.PI // Calculate the angle at which the element will be placed.
-      // For a semicircle, we would use (i / numNodes) * Math.PI.
       x1 = (40 * Math.cos(angle)) + (width/2) // Calculate the x position of the element - radius of circle.
       y1 = (40 * Math.sin(angle)) + (height/2)
-      x2 = ((radius-30) * Math.cos(angle)) + (width/2) // Calculate the x position of the element.
-      y2 = ((radius-30) * Math.sin(angle)) + (height/2)
-      x = ((radius) * Math.cos(angle)) + (width/2) // Calculate the x position of the element.
-      y = ((radius) * Math.sin(angle)) + (height/2) // Calculate the y position of the element.
-
+      x2 = ((radius-30) * Math.cos(angle)) + (width/2) // destination point for spoke
+      y2 = ((radius-30) * Math.sin(angle)) + (height/2) // destination point for spoke
+      x = ((radius) * Math.cos(angle)) + (width/2) // Calculate the x position of circle.
+      y = ((radius) * Math.sin(angle)) + (height/2) // Calculate the y position of circle.
+      console.log(radius)
       nodes.push({'w': x1, 'h': y1, 'x': x, 'y': y,'x2': x2, 'y2': y2, 'id':data[i].id, 'name':data[i].name, 'user':data[i].user, 'color':data[i].color,
       'url':data[i].previewMP3,
       'parent':clickedSound.parent }, )
     }
     return nodes
-
   }
 
 const createElements = function (svgCanvas, nodes, elementRadius, data, clickedSound, width, height) {
@@ -103,13 +103,26 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
                     .on("mouseenter", function(d) {
                       d3.select(this).style("opacity", .2)
                       displayLink(d)
-                      //  d.previewMP3.loop('true', d.id) -- d.previewMP3.fade(0.0, 0.9, 100)
-                        d.url.play() //fade might not working!!
+                        d.url.play()
+                    })
+                    .on("touchstart", function(d) {
+                      d3.select(this).style("opacity", .2)
+                      displayLink(d)
+                      d.url.play()
                     })
                     .on('mouseout', function(d){
                       d3.select(this).style("opacity", 1)
-                      //d.previewMP3.fade(.9, 0.0, 100) //fade might not working!!
                         d.url.pause()
+                    })
+                    .on('touchend', function(d){
+                      d3.select(this).style("opacity", 1)
+                      d.url.pause()
+                      console.log('Touch End')
+                    })
+                    .on('touchcancel', function(d){
+                      d3.select(this).style("opacity", 1)
+                      d.url.pause()
+                      console.log('Touch Cancel')
                     })
                     .on('click', function(d, i) {
                       d.url.pause()
