@@ -1,9 +1,6 @@
 const FREESOUND_SEARCH_URL = 'https://freesound.org/apiv2/search/text/'
 const FREESOUND_SOUND_URL = 'https://freesound.org/apiv2/sounds/'
-//const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
-//const TOKEN = 'arDESEy8t1jg4YeEM3tUntX3MXMeuZBlxEQu9evS'
-const TOKEN = 'Y65kZl2GTZuwcJ9YXtStETJ42ExnHOiPvEyd5Sxd'
-//const TOKEN = `2pPoWxsaljUWbKdOUsVtv3NfVdBtBrfvjmVALAqd`
+const TOKEN = '0I1HhPkTR6FNyhlsfoq4FQAAGob5bgvl6LAlO7A3'
 
 const colorSVG = ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#00BCD4", "#009688", "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722"]
 const soundsGLOBAL = []
@@ -12,6 +9,10 @@ let soundCountGLOBAL = 0
 const totalResults = 8  // make upper case to designate global
 const WIDTH = 800
 const HEIGHT = 600
+let onClickSimilar = null;
+let onClickSound = null;
+
+
 
 const freeSoundAPI = (search) =>{
   const settings = {
@@ -83,9 +84,12 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
       }
       soundsGLOBAL[clickedSoundIndex].similar.push(soundSimilar)
     })
+    onClickSimilar = soundsGLOBAL[clickedSoundIndex].similar
+    onClickSound = clickedSound
     onClickSVG((soundsGLOBAL[clickedSoundIndex].similar), clickedSound)
   }else{
     data.forEach((item, index) => {
+      if(index < 12 ){
       const sound = {
         name: item.name,
         user: item.username,
@@ -98,7 +102,12 @@ const importData = (data, clickedSound, clickedSoundIndex)=>{
         })
       }
       soundsGLOBAL.push(sound)
-    })
+    }}
+      )
+    $('header').removeClass("landingPage")
+    $('main').removeClass("landingPage")
+    $('#freeSoundSearch').removeClass("landingPage")
+    $('#instructions').removeClass("landingPage")
     createSVG(soundsGLOBAL)
   }
 }else{
@@ -115,27 +124,28 @@ const handleFormSubmit = (event) =>{
 }
 
 const noSearchResults = () =>{
-    $('main').html('')
-    $('main').append(`
+    $('results').html('')
+    $('results').append(`
       <section role="region" id="instructions" aria-live="assertive">
-        <span> There are not enough search results </span>
+        <span> There are not enough search results. Please try again. </span>
       </section>
       `)
 }
 
 const createSVG = (data) =>{
 
-const innerWidth = window.innerWidth
-const mobile = innerWidth < 640
-  const width = mobile ? innerWidth : WIDTH
+const innerWidth = window.innerWidth // window.devicePixelRatio
+console.log(window.devicePixelRatio) //number times scale; 1.0 or 2.0
+const mobile = innerWidth <= 640
+  const width = innerWidth // mobile ? innerWidth : 640
   const columns = mobile ? 3 : 4
   const multiplier = mobile ? width/3 : width/5
   const offset = width/6
   const radius = mobile ? 25 : 40
-  const svgCanvas = d3.select('main').html('')
+  const svgCanvas = d3.select('#results').html('')
   .append('svg')
   .attr('width', width)
-  .attr('height', HEIGHT)
+  .attr('height', window.innerHeight - 60) //s window.devicePixelRatio
 
   const circleAttributes = svgCanvas.selectAll('circle')
   .data(data)
@@ -167,12 +177,11 @@ const mobile = innerWidth < 640
           d.previewMP3.pause()
           console.log('Touch Cancel')
       })
-      .on('touchend', function(d){
-          d3.select(this).style("opacity", 1)
-          d.previewMP3.pause()
-          console.log('Touch End')
-      })
       .on('click', function(d, i) {
+          d.previewMP3.pause()
+          freeSoundSimilar(soundsGLOBAL[i], i) //map d to actual clicked sound
+      })
+      .on('touchend', function(d, i) {
           d.previewMP3.pause()
           freeSoundSimilar(soundsGLOBAL[i], i) //map d to actual clicked sound
       })
@@ -201,6 +210,19 @@ const textTruncate = (str) =>{
         }
 
     const setupUIHandlers = () => {
-      $('#FreeSoundSearch').on('submit', handleFormSubmit)
+      $('#freeSoundSearch').on('submit', handleFormSubmit)
+      $(window).resize((event) => {
+        console.log('resize')
+        if(onClickSimilar && onClickSound){
+          console.log('resized')
+        onClickSVG(onClickSimilar, onClickSound)
+      }})
+      // $(window).on('orientationChange', (event) => {
+      //   console.log('orientation')
+      //   if(onClickSimilar && onClickSound){
+      //     console.log('orientationChanged')
+      //   onClickSVG(onClickSimilar, onClickSound)
+      // }
+      // })
     }
     $(setupUIHandlers)

@@ -1,32 +1,34 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>API Projects</title>
+    <title>Sound Stumble - a playful sample finder for FreeSound.org</title>
     <link href="index.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
-    <header role="banner">
-      <form action="#" name="FreeSoundSearch" method="get" id="FreeSoundSearch" role="search">
+    <header role="banner" class="landingPage">
+    <form action="#" name="FreeSoundSearch" method="get" id="freeSoundSearch" role="search" class="landingPage">
         <fieldset>
-          <legend></legend>
           <label for="q" id="searchText">Sound Search Term </label>
           <input type="search" name="q" id="q" placeholder="...meow">
           <input type="submit" value="Submit">
         </fieldset>
       </form>
-    </div>
-      <div class="soundLink" id="soundLink">
-      </div>
-    </header>
-    <main role="main" id="main">
-      <section role="region" id="results" aria-live="assertive">
-        </section>
-      <section role="region" id="instructions" aria-live="assertive">
-        <span>Enter search term above to begin searching FreeSound.org </span>    
+      <div class="soundLink" id="soundLink" aria-live="assertive"></div>
+      <section role="region" id="instructions" aria-live="assertive" class="landingPage">
+          <p>Enter search term above to begin searching FreeSound.org.</p>
+          <p>Sound Stumble is a tool for sound designers and sample enthusiastis to quickly search, preview and dig through new sounds you may not have discovered other wise. </p>
+          <p class="desktop"> For desktop, use mouse to roll-over each circle to preview sound. Click to dig down and search for related samples of that sound. To download sound click on the sounds link in upper right corner</p>
+          <p class="mobile"> For mobile, tap and hold finger on circle to preview sound. Double tap with finger to select associated samples of that node. This helps dig down and search for related samples of that sound. To download sound click on the sounds link in upper right corner</p>
       </section>
+    </header>
+      <main role="main" id="main" class="landingPage" aria-live="assertive">
+        <div id="results"></div>
+      <!-- <section role="region" id="instructions" aria-live="assertive" class="landingPage">
+        <span>Enter search term above to begin searching FreeSound.org </span>
+      </section> -->
     </main>
 
 <!-- End Scrips -->

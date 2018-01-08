@@ -1,10 +1,11 @@
 //onClickSVG
 const onClickSVG = (data, clickedSound) =>{
+  let h = window.innerHeight;
+  let w = window.innerWidth; //to avoid undefined - bc undefined is ambigeous as to intent
 
-
-  const mobile = window.innerWidth < 640
-  const width = mobile ? window.innerWidth : WIDTH
-  const height = mobile ? window.innerHeight : HEIGHT
+  const mobile = w <= 640
+  const width = mobile ? w : WIDTH
+  const height = mobile ? (h-80) : HEIGHT
   // const height = width*.75
   //const offset = width/6
   const radius = mobile ? width*.35 : width/4
@@ -12,7 +13,7 @@ const onClickSVG = (data, clickedSound) =>{
   const circleDestinationX = width/2
   const circleDestinationY = height/2
 
-  const svgCanvas = d3.select('main').select('svg')
+  const svgCanvas = d3.select('#results').select('svg')
 
   svgCanvas.selectAll('circle')
   .transition()
@@ -55,7 +56,7 @@ const onClickSVG = (data, clickedSound) =>{
       y2 = ((radius-30) * Math.sin(angle)) + (height/2) // destination point for spoke
       x = ((radius) * Math.cos(angle)) + (width/2) // Calculate the x position of circle.
       y = ((radius) * Math.sin(angle)) + (height/2) // Calculate the y position of circle.
-      console.log(radius)
+      // console.log(radius)
       nodes.push({'w': x1, 'h': y1, 'x': x, 'y': y,'x2': x2, 'y2': y2, 'id':data[i].id, 'name':data[i].name, 'user':data[i].user, 'color':data[i].color,
       'url':data[i].previewMP3,
       'parent':clickedSound.parent }, )
@@ -120,9 +121,11 @@ const createElements = function (svgCanvas, nodes, elementRadius, data, clickedS
                       console.log('Touch End')
                     })
                     .on('touchcancel', function(d){
-                      d3.select(this).style("opacity", 1)
-                      d.url.pause()
-                      console.log('Touch Cancel')
+                        d.url.pause()
+                        if(i===0){
+                        }else{
+                        freeSoundSimilar(d, i)
+                      }
                     })
                     .on('click', function(d, i) {
                       d.url.pause()
